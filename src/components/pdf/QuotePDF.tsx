@@ -37,14 +37,14 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-export const QuotePDF = ({ data }: { data: any }) => (
+export const QuotePDF = ({ data }: { data: { types: string[]; totalA: number; totalB: number; totalC: number; grandTotal: number } }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.header}>御見積書</Text>
       <View style={styles.section}>
         <Text style={styles.text}>株式会社 〇〇 様</Text>
         <Text style={styles.text}>以下の通り御見積申し上げます。</Text>
-        
+
         {/* Placeholder for dynamic items */}
         <Text style={{ ...styles.text, marginTop: 20 }}>【内訳】</Text>
         {data.types.includes('A') && <Text style={styles.text}>・シロアリ駆除作業 一式: ¥{data.totalA.toLocaleString()}</Text>}

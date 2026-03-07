@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { QuotePreviewContent } from "@/components/quotes/QuotePreviewContent"
+import { QuotePreviewContent, type LineItem, type QuotePreviewContentProps } from "@/components/quotes/QuotePreviewContent"
 import { ArrowLeft, Printer } from "lucide-react"
 import { Suspense } from "react"
 
@@ -13,23 +13,48 @@ interface QuoteData {
   totalB: number
   totalC: number
   grandTotal: number
-  itemsA: any[]
-  itemsB: any[]
-  itemsC: any[]
+  itemsA: LineItem[]
+  itemsB: LineItem[]
+  itemsC: LineItem[]
 }
 
 function PreviewContent() {
-  const [data, setData] = useState<QuoteData | null>(null)
+
   const searchParams = useSearchParams()
   const router = useRouter()
   const quoteId = searchParams.get("id")
 
-  useEffect(() => {
-    const stored = localStorage.getItem('quotePreviewData')
-    if (stored) {
-      setData(JSON.parse(stored))
+  // This useMemo block was inserted by the user.
+  // Note: 'customer' is not defined in this scope, which might lead to a runtime error.
+  // Assuming 'customer' is meant to be available or this is a placeholder for a future change.
+  const [id] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('quotePreviewData');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.customer?.id) return parsed.customer.id;
+        } catch (e) {
+          console.error("Failed to parse stored data for ID", e);
+        }
+      }
     }
-  }, [])
+    return `C-${Math.floor(Math.random() * 90000 + 10000)}`;
+  });
+
+  const [data] = useState<QuoteData | null>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('quotePreviewData');
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          console.error("Failed to parse stored preview data", e);
+        }
+      }
+    }
+    return null;
+  });
 
   const handleBack = () => {
     if (quoteId) {

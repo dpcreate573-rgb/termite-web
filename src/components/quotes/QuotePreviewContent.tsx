@@ -1,6 +1,7 @@
 "use client"
 
 import { memo } from "react"
+import { formatWareki } from "@/lib/date"
 
 export interface LineItem {
   name: string
@@ -11,27 +12,28 @@ export interface LineItem {
 }
 
 interface QuotePreviewContentProps {
+  quoteId?: string
   customerName?: string
   subject?: string
   totalA: number
   totalB: number
   totalC: number
   grandTotal: number
-  itemsA: any[]
-  itemsB: any[]
-  itemsC: any[]
+  itemsA: LineItem[]
+  itemsB: LineItem[]
+  itemsC: LineItem[]
 }
 
 export const QuotePreviewContent = memo(function QuotePreviewContent({
+  quoteId,
   customerName = "御中",
   subject,
-  totalA, totalB, totalC, grandTotal, itemsA, itemsB, itemsC
+  grandTotal, itemsA, itemsB, itemsC
 }: QuotePreviewContentProps) {
   const tax = Math.floor(grandTotal * 0.10)
   const totalWithTax = grandTotal + tax
 
-  const today = new Date()
-  const dateStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`
+  const dateStr = formatWareki(new Date());
 
   // Combine all line items into a single flat list
   const allItems: LineItem[] = [...itemsA, ...itemsB, ...itemsC]
@@ -44,7 +46,7 @@ export const QuotePreviewContent = memo(function QuotePreviewContent({
 
       {/* Header */}
       <header className="flex justify-between items-center mb-4">
-        <p className="w-1/4">No. <span className="text-sm">—</span></p>
+        <p className="w-1/4">No. <span className="text-sm">{quoteId ? (quoteId.length > 8 ? `${quoteId.slice(0, 4).toUpperCase()}-${quoteId.slice(4, 8).toUpperCase()}` : quoteId) : "—"}</span></p>
         <h1 className="px-6 text-center text-xl font-normal text-white bg-green-700 py-1 tracking-[0.2em] rounded-sm">
           御見積書
         </h1>

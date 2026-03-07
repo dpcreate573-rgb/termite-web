@@ -6,10 +6,10 @@ import { ArrowLeft, Edit3, Save, Lock, FileText, Loader2, Printer } from "lucide
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { QuotePreviewContent } from "@/components/quotes/QuotePreviewContent"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { QuotePreviewContent } from "@/components/quotes/QuotePreviewContent"
+import { formatWareki } from "@/lib/date"
 
 import { updateQuoteDetailAction } from "./actions"
 
@@ -24,31 +24,30 @@ type QuoteDetailItem = {
 
 type QuoteDetailClientProps = {
     quoteId: string;
-    projectId: string;
     status: string;
     subject: string | null;
-    projectTypes: string[];
     customerName: string;
     itemsA: QuoteDetailItem[];
-    totalA: number;
     grandTotal: number;
     createdAt: number | Date;
+    projectId?: string;
+    projectTypes?: string[];
+    totalA?: number;
+    defaultEditMode?: boolean;
 }
 
 export function QuoteDetailClient({
     quoteId,
-    projectId,
     status,
     subject,
-    projectTypes,
     customerName,
     itemsA,
-    totalA,
     grandTotal,
-    createdAt
+    createdAt,
+    defaultEditMode = false
 }: QuoteDetailClientProps) {
     const router = useRouter()
-    const [isEditing, setIsEditing] = useState(false)
+    const [isEditing, setIsEditing] = useState(defaultEditMode && status !== "completed")
     const [isSaving, setIsSaving] = useState(false)
 
     // Form state (Editing mode mockup)
@@ -81,7 +80,7 @@ export function QuoteDetailClient({
         setEditItems([...itemsA])
     }
 
-    const handleItemChange = (index: number, field: keyof QuoteDetailItem, value: any) => {
+    const handleItemChange = (index: number, field: keyof QuoteDetailItem, value: string | number) => {
         const newItems = [...editItems]
         newItems[index] = { ...newItems[index], [field]: value }
         if (field === "quantity" || field === "unitPrice") {
@@ -96,9 +95,7 @@ export function QuoteDetailClient({
         ? editItems.reduce((acc, curr) => acc + curr.totalPrice, 0)
         : grandTotal;
 
-    const formattedDate = new Intl.DateTimeFormat('ja-JP-u-ca-japanese', {
-        era: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    }).format(new Date(createdAt));
+    const formattedDate = formatWareki(createdAt);
 
     return (
         <div className="container mx-auto p-4 md:p-6 space-y-8 max-w-5xl">
@@ -262,6 +259,7 @@ export function QuoteDetailClient({
                         <div className="mx-auto w-fit">
                             <div className="shadow-[0_8px_40px_rgba(0,0,0,0.35)] print:shadow-none">
                                 <QuotePreviewContent
+                                    quoteId={quoteId}
                                     customerName={customerName}
                                     subject={subject || ""}
                                     totalA={currentTotal}

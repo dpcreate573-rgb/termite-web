@@ -32,7 +32,7 @@ async function main() {
 
         console.log(`Found ${records.length} records. Inserting into db...`);
 
-        const itemsToInsert = records.map((record: any) => {
+        const itemsToInsert = (records as Record<string, string>[]).map((record) => {
             // 単価のパース処理: "7,000" -> 7000, "-" -> null
             let unitPrice = null;
             if (record["単価"] && record["単価"] !== "-") {

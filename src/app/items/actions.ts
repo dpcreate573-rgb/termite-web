@@ -19,6 +19,10 @@ export async function getItemById(id: string) {
     return records[0] || null;
 }
 
+export async function getItemsByCategory(category: string) {
+    return await db.select().from(items).where(eq(items.category, category));
+}
+
 export async function createItem(input: ItemInput) {
     const newId = crypto.randomUUID();
     await db.insert(items).values({

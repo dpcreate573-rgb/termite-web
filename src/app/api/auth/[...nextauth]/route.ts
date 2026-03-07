@@ -1,10 +1,7 @@
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 
-// List of allowed emails (e.g., company employees)
-const ALLOWED_EMAILS = [
-  // "employee@yourcompany.com",
-];
+
 
 export const authOptions = {
   providers: [
@@ -14,17 +11,9 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }: any) {
+    async signIn({ account }) {
       if (account?.provider === "google") {
-        // Uncomment the following lines to restrict access to specific emails
-        // if (user.email && ALLOWED_EMAILS.includes(user.email)) {
-        //   return true;
-        // }
-        // return false; // Return false to deny access
-
-        // Currently allowing all Google logins for testing. 
-        // In production, restrict this.
-        return true; 
+        return true;
       }
       return false;
     },

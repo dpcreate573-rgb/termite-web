@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Plus, Edit, ArrowLeft, Save, User, ChevronLeft, ChevronRight, Loader2, ExternalLink } from "lucide-react"
 import { getCustomers, createCustomer, updateCustomer, type CustomerInput, type CustomerType } from "./actions"
 import { useRouter, useSearchParams } from "next/navigation"
+import { formatWareki } from "@/lib/date"
 
 // ========================
 // Types
@@ -53,7 +54,7 @@ function CustomerForm({
   const [referee, setReferee] = useState(customer?.referee || "")
   const [refereeTel, setRefereeTel] = useState(customer?.refereeTel || "")
   const [memo, setMemo] = useState(customer?.memo || "")
-  const id = customer?.id || `C-${Math.floor(Math.random() * 90000 + 10000)}`
+  const [id] = useState(() => customer?.id || `C-${Math.floor(Math.random() * 90000 + 10000)}`)
 
   const handleSave = () => {
     if (!name || !tel) {
@@ -366,7 +367,7 @@ function CustomersContent() {
                 <table className="w-full text-sm text-left">
                   <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 font-semibold w-28">顧客コード</th>
+                      <th className="px-6 py-3 font-semibold w-32 whitespace-nowrap">顧客コード</th>
                       <th className="px-6 py-3 font-semibold">顧客名 / 区分</th>
                       <th className="px-6 py-3 font-semibold">連絡先 (TEL / 住所)</th>
                       <th className="px-6 py-3 font-semibold w-32">最終取引日</th>
@@ -380,7 +381,7 @@ function CustomersContent() {
                         className="bg-white hover:bg-blue-50/50 transition-colors cursor-pointer group"
                         onClick={(e) => handleRowClick(c.id, e)}
                       >
-                        <td className="px-6 py-4 font-medium text-gray-900 font-mono group-hover:text-blue-600 transition-colors">
+                        <td className="px-6 py-4 font-medium text-gray-900 font-mono group-hover:text-blue-600 transition-colors whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             {c.id}
                             <ExternalLink className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -400,7 +401,7 @@ function CustomersContent() {
                           <div className="text-gray-900 font-medium">{c.tel}</div>
                           <div className="text-xs text-gray-500 mt-1 truncate max-w-[200px]" title={c.address || ""}>{c.address}</div>
                         </td>
-                        <td className="px-6 py-4 text-gray-500">{c.date}</td>
+                        <td className="px-6 py-4 text-gray-500 text-xs whitespace-nowrap">{formatWareki(c.date)}</td>
                         <td className="px-6 py-4 text-center">
                           <Button variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100" onClick={() => handleEdit(c)} title="編集する">
                             <Edit className="w-4 h-4" />

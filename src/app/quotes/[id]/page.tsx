@@ -20,8 +20,16 @@ export const metadata: Metadata = {
 
 export const revalidate = 0;
 
-export default async function QuoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function QuoteDetailPage({
+    params,
+    searchParams
+}: {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
     const { id } = await params;
+    const sParams = await searchParams;
+    const defaultEditMode = sParams?.edit === 'true';
 
     // 1. Fetch Quote
     const quoteResult = await db
@@ -84,6 +92,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
                 totalA={totalA}
                 grandTotal={grandTotal}
                 createdAt={quote.createdAt}
+                defaultEditMode={defaultEditMode}
             />
         </AppLayout>
     )
