@@ -26,6 +26,7 @@ export const projects = sqliteTable("projects", {
 export const quotes = sqliteTable("quotes", {
   id: text("id").primaryKey(),
   projectId: text("project_id").notNull().references(() => projects.id),
+  subject: text("subject"), // 件名
   termiteCalcData: text("termite_calc_data"), // JSON
   pestCalcData: text("pest_calc_data"), // JSON
   createdAt: integer("created_at", { mode: 'timestamp' }).notNull(),
@@ -54,5 +55,15 @@ export const guarantees = sqliteTable("guarantees", {
   projectId: text("project_id").notNull().references(() => projects.id),
   issueDate: integer("issue_date", { mode: 'timestamp' }).notNull(),
   expireDate: integer("expire_date", { mode: 'timestamp' }).notNull(), // 5 years
+  createdAt: integer("created_at", { mode: 'timestamp' }).notNull(),
+});
+
+export const items = sqliteTable("items", {
+  id: text("id").primaryKey(),
+  category: text("category").notNull(),
+  name: text("name").notNull(),
+  unitPrice: integer("unit_price"), // '-' の場合は null にするため undefined を許可する
+  unit: text("unit").notNull(),
+  remarks: text("remarks"),
   createdAt: integer("created_at", { mode: 'timestamp' }).notNull(),
 });

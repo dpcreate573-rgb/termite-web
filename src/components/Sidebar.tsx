@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useState } from "react"
 import {
   Home, FileBox, Receipt, ShieldCheck, Users, Package,
-  Settings, LogOut, ChevronDown, ChevronRight, Bug, ShoppingBag, Layers
+  Settings, LogOut, ChevronDown, ChevronRight, Plus
 } from "lucide-react"
 
 const navItems = [
@@ -16,10 +16,8 @@ const navItems = [
     icon: FileBox,
     href: "/quotes",
     subItems: [
-      { label: "シロアリ駆除見積", href: "/quotes/new?type=A", icon: ShieldCheck },
-      { label: "害虫・害獣駆除見積", href: "/quotes/new?type=B", icon: Bug },
-      { label: "商品・物販見積", href: "/quotes/new?type=C", icon: ShoppingBag },
-      { label: "複合見積作成", href: "/quotes/new?type=ABC", icon: Layers },
+      { label: "見積書一覧表示", href: "/quotes", icon: FileBox },
+      { label: "見積書新規作成", href: "/quotes/new", icon: Plus },
     ]
   },
   { label: "請求書管理", href: "/invoices", icon: Receipt },
@@ -28,7 +26,7 @@ const navItems = [
 
 const masterItems = [
   { label: "顧客マスター", href: "/customers", icon: Users },
-  { label: "商品・施工マスター", href: "/products", icon: Package },
+  { label: "施工品目マスター", href: "/items", icon: Package },
 ]
 
 export function Sidebar() {
@@ -72,9 +70,8 @@ export function Sidebar() {
               <div key={item.label}>
                 <button
                   onClick={() => toggleSection(item.label)}
-                  className={`flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-md transition-colors text-left ${
-                    isActive(item.href!) ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-md transition-colors text-left ${isActive(item.href!) ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <span className="flex items-center gap-3">
                     <Icon className="w-5 h-5" />
@@ -90,11 +87,10 @@ export function Sidebar() {
                         <Link
                           key={sub.href}
                           href={sub.href}
-                          className={`flex items-center gap-2.5 px-3 py-2 text-sm rounded-md transition-colors ${
-                            pathname === sub.href.split("?")[0] && pathname.includes(sub.href.split("=")[1] || "")
-                              ? "bg-blue-50 text-blue-700 font-medium"
-                              : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                          }`}
+                          className={`flex items-center gap-2.5 px-3 py-2 text-sm rounded-md transition-colors ${pathname === sub.href.split("?")[0] && pathname.includes(sub.href.split("=")[1] || "")
+                            ? "bg-blue-50 text-blue-700 font-medium"
+                            : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                            }`}
                         >
                           <SubIcon className="w-4 h-4" />
                           {sub.label}
@@ -111,9 +107,8 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href!}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors ${
-                active ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600 hover:bg-gray-100"
-              }`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors ${active ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600 hover:bg-gray-100"
+                }`}
             >
               <Icon className="w-5 h-5" />
               {item.label}
@@ -129,9 +124,8 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors ${
-                isActive(item.href) ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600 hover:bg-gray-100"
-              }`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors ${isActive(item.href) ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600 hover:bg-gray-100"
+                }`}
             >
               <Icon className="w-5 h-5" />
               {item.label}

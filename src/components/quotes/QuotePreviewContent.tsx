@@ -12,6 +12,7 @@ export interface LineItem {
 
 interface QuotePreviewContentProps {
   customerName?: string
+  subject?: string
   totalA: number
   totalB: number
   totalC: number
@@ -23,6 +24,7 @@ interface QuotePreviewContentProps {
 
 export const QuotePreviewContent = memo(function QuotePreviewContent({
   customerName = "御中",
+  subject,
   totalA, totalB, totalC, grandTotal, itemsA, itemsB, itemsC
 }: QuotePreviewContentProps) {
   const tax = Math.floor(grandTotal * 0.10)
@@ -57,7 +59,7 @@ export const QuotePreviewContent = memo(function QuotePreviewContent({
             {customerName}<span className="text-lg ml-1">様</span>
           </h2>
           <div className="mb-2 w-full border-b border-gray-300 pb-1">
-            <p className="text-sm">件名：<span className="text-[1.1em]">&nbsp;</span></p>
+            <p className="text-sm">件名：<span className="text-[1.1em]">{subject || <>&nbsp;</>}</span></p>
           </div>
           <p className="my-1">有効期限：<span>&nbsp;</span></p>
           <p className="my-1">下記の通り御見積り申し上げます。</p>

@@ -2,7 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import { QuotePreviewContent } from "@/components/quotes/QuotePreviewContent"
+import { ArrowLeft, Printer } from "lucide-react"
+import { Suspense } from "react"
 
 interface QuoteData {
   customerName?: string
@@ -15,8 +18,11 @@ interface QuoteData {
   itemsC: any[]
 }
 
-export default function QuotePreviewPage() {
+function PreviewContent() {
   const [data, setData] = useState<QuoteData | null>(null)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const quoteId = searchParams.get("id")
 
   useEffect(() => {
     const stored = localStorage.getItem('quotePreviewData')
@@ -25,18 +31,32 @@ export default function QuotePreviewPage() {
     }
   }, [])
 
+  const handleBack = () => {
+    if (quoteId) {
+      router.push(`/quotes/${quoteId}`)
+    } else {
+      router.push("/quotes")
+    }
+  }
+
   if (!data) {
     return <div className="p-12 text-center text-gray-500">読み込み中...</div>
   }
 
   return (
-    <div className="min-h-screen bg-gray-200 py-6 px-4 font-sans print:bg-white print:p-0 print:m-0">
+    <div className="min-h-screen bg-gray-400 py-6 px-4 font-sans print:bg-white print:p-0 print:m-0">
       <div className="flex justify-between items-center max-w-[210mm] mx-auto mb-4 print:hidden">
-        <Button variant="outline" onClick={() => window.close()}>閉じる</Button>
-        <Button onClick={() => window.print()}>印刷する / PDF保存</Button>
+        <Button variant="outline" className="bg-white hover:bg-neutral-100" onClick={handleBack}>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {quoteId ? "詳細に戻る" : "一覧に戻る"}
+        </Button>
+        <Button onClick={() => window.print()}>
+          <Printer className="w-4 h-4 mr-2" />
+          印刷する / PDF保存
+        </Button>
       </div>
 
-      <div className="page-wrapper shadow-lg print:shadow-none print:m-0">
+      <div className="page-wrapper shadow-[0_8px_40px_rgba(0,0,0,0.4)] mx-auto w-fit print:shadow-none print:m-0">
         <QuotePreviewContent
           customerName={data.customerName}
           totalA={data.totalA}
@@ -71,5 +91,13 @@ export default function QuotePreviewPage() {
         }
       `}} />
     </div>
+  )
+}
+
+export default function QuotePreviewPage() {
+  return (
+    <Suspense fallback={<div className="p-12 text-center text-gray-500">読み込み中...</div>}>
+      <PreviewContent />
+    </Suspense>
   )
 }
