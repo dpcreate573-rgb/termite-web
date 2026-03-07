@@ -6,11 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation"
+import { AppLayout } from "@/components/AppLayout"
 
 import { QuoteFormA } from "@/components/quotes/QuoteFormA"
 import { QuoteFormB } from "@/components/quotes/QuoteFormB"
 import { QuoteFormC } from "@/components/quotes/QuoteFormC"
+import { QuotePreviewContent } from "@/components/quotes/QuotePreviewContent"
 import { Suspense } from "react"
 
 function NewQuoteForm() {
@@ -21,8 +24,12 @@ function NewQuoteForm() {
   const [totalA, setTotalA] = useState(0)
   const [totalB, setTotalB] = useState(0)
   const [totalC, setTotalC] = useState(0)
+  const [itemsA, setItemsA] = useState<any[]>([])
+  const [itemsB, setItemsB] = useState<any[]>([])
+  const [itemsC, setItemsC] = useState<any[]>([])
   
   const [isUploading, setIsUploading] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
 
   useEffect(() => {
     const typeParam = searchParams.get('type')
@@ -44,9 +51,9 @@ function NewQuoteForm() {
     if (typeValue === 'C' && types.includes('C')) setTotalC(0)
   }
 
-  const handleUpdateA = (data: { total: number }) => setTotalA(data.total);
-  const handleUpdateB = (data: { total: number }) => setTotalB(data.total);
-  const handleUpdateC = (data: { total: number }) => setTotalC(data.total);
+  const handleUpdateA = (data: { total: number; items?: any[] }) => { setTotalA(data.total); if (data.items) setItemsA(data.items) }
+  const handleUpdateB = (data: { total: number; items?: any[] }) => { setTotalB(data.total); if (data.items) setItemsB(data.items) }
+  const handleUpdateC = (data: { total: number; items?: any[] }) => { setTotalC(data.total); if (data.items) setItemsC(data.items) }
 
   const grandTotal = useMemo(() => {
     let t = 0;
@@ -69,18 +76,7 @@ function NewQuoteForm() {
   }
 
   const handlePreview = () => {
-    // Store full quote data in localStorage for the preview page
-    const previewData = {
-      types,
-      totalA,
-      totalB, 
-      totalC,
-      grandTotal,
-    }
-    localStorage.setItem('quotePreviewData', JSON.stringify(previewData))
-    
-    // Open preview in new tab
-    window.open('/quotes/preview', '_blank')
+    setShowPreview(true)
   }
 
   const handleSaveAndUpload = async () => {
@@ -224,14 +220,48 @@ function NewQuoteForm() {
           見積を作成するには、案件種別（A/B/C）のいずれかを選択してください。
         </div>
       )}
+
+      {/* 見積プレビューモーダル */}
+      <Dialog open={showPreview} onOpenChange={setShowPreview}>
+        <DialogContent className="max-w-[95vw] w-auto h-[95vh] p-0 overflow-hidden bg-gray-200 flex flex-col">
+          <div className="flex justify-between items-center px-6 pt-4 pb-2">
+            <DialogTitle className="text-lg font-semibold">見積書プレビュー</DialogTitle>
+            <DialogDescription className="sr-only">見積書のA4プレビュー表示</DialogDescription>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => {
+                localStorage.setItem('quotePreviewData', JSON.stringify({ types, totalA, totalB, totalC, grandTotal }))
+                window.open('/quotes/preview', '_blank')
+              }}>印刷用に開く</Button>
+              <Button variant="outline" size="sm" onClick={() => setShowPreview(false)}>閉じる</Button>
+            </div>
+          </div>
+          <div className="flex-1 overflow-auto flex justify-center px-4 pb-4">
+            <div className="origin-top" style={{ transform: 'scale(0.62)', transformOrigin: 'top center' }}>
+              <div className="shadow-lg border border-gray-300 rounded overflow-hidden">
+                <QuotePreviewContent
+                  totalA={totalA}
+                  totalB={totalB}
+                  totalC={totalC}
+                  grandTotal={grandTotal}
+                  itemsA={itemsA}
+                  itemsB={itemsB}
+                  itemsC={itemsC}
+                />
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
 
 export default function NewQuotePage() {
   return (
-    <Suspense fallback={<div className="p-10 text-center text-gray-500">読み込み中...</div>}>
-      <NewQuoteForm />
-    </Suspense>
+    <AppLayout>
+      <Suspense fallback={<div className="p-10 text-center text-gray-500">読み込み中...</div>}>
+        <NewQuoteForm />
+      </Suspense>
+    </AppLayout>
   )
 }

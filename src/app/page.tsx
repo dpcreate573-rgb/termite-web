@@ -1,9 +1,11 @@
 "use client"
 
-import { useSession, signOut } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { AppLayout } from "@/components/AppLayout"
+import { FileBox, Receipt, ShieldCheck, TrendingUp, Clock, AlertCircle } from "lucide-react"
+import Link from "next/link"
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -24,47 +26,88 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex items-center justify-between border-b px-6 py-4 bg-white">
-        <h1 className="text-xl font-bold">Termit (シロアリ・害虫駆除業務管理)</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">{session.user?.email}</span>
-          <Button variant="outline" size="sm" onClick={() => signOut()}>
-            ログアウト
-          </Button>
-        </div>
-      </header>
-      <main className="flex-1 p-6 bg-slate-50">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Quick links or dashboard stats here */}
-          <div className="col-span-1 border rounded-lg p-6 bg-white shadow-sm">
-            <h2 className="text-lg font-semibold mb-4">機能メニュー</h2>
-            <div className="space-y-2">
-              <Button className="w-full justify-start" onClick={() => router.push('/quotes/new?type=A')}>シロアリ駆除見積</Button>
-              <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/quotes/new?type=B')}>害虫・害獣駆除見積</Button>
-              <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/quotes/new?type=C')}>商品・物販見積</Button>
-              <Button className="w-full justify-start" variant="secondary" onClick={() => router.push('/quotes/new?type=ABC')}>複合見積作成</Button>
+    <AppLayout>
+      <div className="p-4 md:p-8">
+        <div className="max-w-6xl mx-auto space-y-6 pb-6">
+
+          {/* Header */}
+          <div>
+            <p className="text-sm text-gray-500 mb-1">ホーム</p>
+            <h2 className="text-2xl font-bold">ダッシュボード</h2>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm text-gray-500">今月の見積</span>
+                <FileBox className="w-5 h-5 text-blue-500" />
+              </div>
+              <p className="text-3xl font-bold text-gray-900">—</p>
+              <p className="text-xs text-gray-400 mt-1">件数</p>
             </div>
-            
-            <h2 className="text-lg font-semibold mt-8 mb-4 border-t pt-4">管理メニュー</h2>
-            <div className="space-y-2">
-              <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/invoices')}>
-                請求一覧・入金管理
-              </Button>
-              <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/guarantees')}>
-                保証書(5年保証) 管理
-              </Button>
-              <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/quotes')}>
-                見積履歴
-              </Button>
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm text-gray-500">未請求</span>
+                <Receipt className="w-5 h-5 text-orange-500" />
+              </div>
+              <p className="text-3xl font-bold text-gray-900">—</p>
+              <p className="text-xs text-gray-400 mt-1">件数</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm text-gray-500">保証書発行済</span>
+                <ShieldCheck className="w-5 h-5 text-green-500" />
+              </div>
+              <p className="text-3xl font-bold text-gray-900">—</p>
+              <p className="text-xs text-gray-400 mt-1">件数</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm text-gray-500">今月の売上</span>
+                <TrendingUp className="w-5 h-5 text-indigo-500" />
+              </div>
+              <p className="text-3xl font-bold text-gray-900">—</p>
+              <p className="text-xs text-gray-400 mt-1">円</p>
             </div>
           </div>
-          <div className="col-span-2 border rounded-lg p-6 bg-white shadow-sm">
-            <h2 className="text-lg font-semibold mb-4">最近の案件・見積</h2>
-            <p className="text-sm text-gray-500">データがありません</p>
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Recent Activity */}
+            <div className="lg:col-span-2 rounded-xl border border-gray-200 bg-white shadow-sm">
+              <div className="p-5 border-b border-gray-100 bg-gray-50/50 rounded-t-xl">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-gray-400" />
+                  最近の案件・見積
+                </h3>
+              </div>
+              <div className="p-8 text-center text-gray-400">
+                <p className="text-sm">データがありません</p>
+                <p className="text-xs mt-1">見積を作成すると、ここに表示されます</p>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+              <div className="p-5 border-b border-gray-100 bg-gray-50/50 rounded-t-xl">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-gray-400" />
+                  お知らせ
+                </h3>
+              </div>
+              <div className="p-5 space-y-3">
+                <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-800">
+                  左メニューの「見積書管理」から見積を作成できます。
+                </div>
+                <div className="p-3 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-600">
+                  顧客マスター・商品マスターは今後実装予定です。
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

@@ -27,8 +27,21 @@ export const QuoteFormB = memo(function QuoteFormB({ onUpdate }: { onUpdate: (da
   const basePrice = pattern === "spot" ? 20000 : 50000;
   const total = basePrice + itemsTotal;
 
+  const buildItems = () => {
+    const patternLabel = pattern === "spot" ? "スポット駆除 基本料金" : "定期管理（IPM）基本料金"
+    const lineItems: { name: string; qty: number; unit: string; price: number; amount: number }[] = [
+      { name: patternLabel, qty: 1, unit: "式", price: basePrice, amount: basePrice }
+    ]
+    items.forEach(item => {
+      if (item.name && item.price > 0) {
+        lineItems.push({ name: item.name, qty: item.qty, unit: "個", price: item.price, amount: item.price * item.qty })
+      }
+    })
+    return lineItems
+  }
+
   useEffect(() => {
-    onUpdate({ total })
+    onUpdate({ total, items: buildItems() })
   }, [total]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

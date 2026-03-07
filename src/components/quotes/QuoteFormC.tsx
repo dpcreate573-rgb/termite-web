@@ -23,8 +23,14 @@ export const QuoteFormC = memo(function QuoteFormC({ onUpdate }: { onUpdate: (da
 
   const total = items.reduce((sum, item) => sum + (item.price * item.qty), 0)
 
+  const buildItems = () => {
+    return items
+      .filter(item => item.name && item.price > 0)
+      .map(item => ({ name: item.name, qty: item.qty, unit: "個", price: item.price, amount: item.price * item.qty }))
+  }
+
   useEffect(() => {
-    onUpdate({ total })
+    onUpdate({ total, items: buildItems() })
   }, [total]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

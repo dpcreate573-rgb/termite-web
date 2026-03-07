@@ -2,8 +2,10 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
 export const customers = sqliteTable("customers", {
   id: text("id").primaryKey(),
+  type: text("type").notNull(), // "法人" | "個人"
   name: text("name").notNull(),
-  contact: text("contact"),
+  furigana: text("furigana"),
+  tel: text("tel"),
   address: text("address"),
   createdAt: integer("created_at", { mode: 'timestamp' }).notNull(),
 });
