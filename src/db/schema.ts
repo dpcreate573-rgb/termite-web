@@ -7,6 +7,11 @@ export const customers = sqliteTable("customers", {
   furigana: text("furigana"),
   tel: text("tel"),
   address: text("address"),
+  contactPerson: text("contact_person"),     // 担当者
+  contactPersonTel: text("contact_person_tel"), // 担当者電話
+  referee: text("referee"),                 // 紹介者
+  refereeTel: text("referee_tel"),          // 紹介者電話
+  memo: text("memo"),                       // メモ
   createdAt: integer("created_at", { mode: 'timestamp' }).notNull(),
 });
 

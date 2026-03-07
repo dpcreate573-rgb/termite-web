@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, Suspense } from "react"
 import { AppLayout } from "@/components/AppLayout"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Plus, Edit, ArrowLeft, Save, User, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
+import { Search, Plus, Edit, ArrowLeft, Save, User, ChevronLeft, ChevronRight, Loader2, ExternalLink } from "lucide-react"
 import { getCustomers, createCustomer, updateCustomer, type CustomerInput, type CustomerType } from "./actions"
+import { useRouter, useSearchParams } from "next/navigation"
 
 // ========================
 // Types
@@ -19,31 +20,14 @@ interface Customer {
   furigana: string | null
   tel: string | null
   address: string | null
+  contactPerson: string | null
+  contactPersonTel: string | null
+  referee: string | null
+  refereeTel: string | null
+  memo: string | null
   date: string
 }
 
-const dummyCustomers: Customer[] = [
-  { id: "C-00001", type: "法人", name: "地域共生ステーション (ぬくもいホーム) 明神の家ひいらぎ", furigana: "チイキキョウセイステーション ミョウジンノイエヒイラギ", tel: "0954-23-7334", address: "佐賀県武雄市武雄町永島14704-14", date: "2026/03/05" },
-  { id: "C-00002", type: "法人", name: "株式会社 佐賀建設", furigana: "カブシキガイシャ サガケンセツ", tel: "0952-11-2233", address: "佐賀県佐賀市城内1-1-59", date: "2026/02/28" },
-  { id: "C-00003", type: "個人", name: "山田 太郎", furigana: "ヤマダ タロウ", tel: "090-1234-5678", address: "福岡県福岡市博多区博多駅前1-1-1", date: "2026/02/15" },
-  { id: "C-00004", type: "法人", name: "有限会社 ターマイト工業", furigana: "ユウゲンガイシャ ターマイトコウギョウ", tel: "092-555-1234", address: "福岡県福岡市中央区天神2-3-4", date: "2026/01/20" },
-  { id: "C-00005", type: "個人", name: "鈴木 花子", furigana: "スズキ ハナコ", tel: "090-9876-5432", address: "佐賀県唐津市新興町1-2-3", date: "2026/01/10" },
-  { id: "C-00006", type: "法人", name: "合同会社 九州エステート", furigana: "ゴウドウガイシャ キュウシュウエステート", tel: "092-333-4567", address: "福岡県久留米市中央町3-5-8", date: "2025/12/25" },
-  { id: "C-00007", type: "個人", name: "高橋 健太", furigana: "タカハシ ケンタ", tel: "080-2345-6789", address: "長崎県佐世保市白岳町5-10", date: "2025/12/18" },
-  { id: "C-00008", type: "法人", name: "株式会社 博多ハウジング", furigana: "カブシキガイシャ ハカタハウジング", tel: "092-777-8899", address: "福岡県福岡市早良区百道浜1-2-3", date: "2025/12/01" },
-  { id: "C-00009", type: "個人", name: "田中 大輔", furigana: "タナカ ダイスケ", tel: "090-3456-7890", address: "佐賀県武雄市北方町大字大崎3-1", date: "2025/11/22" },
-  { id: "C-00010", type: "個人", name: "伊藤 美咲", furigana: "イトウ ミサキ", tel: "080-4567-8901", address: "福岡県筑紫野市二日市中央3-4-5", date: "2025/11/15" },
-  { id: "C-00011", type: "法人", name: "有限会社 武雄不動産", furigana: "ユウゲンガイシャ タケオフドウサン", tel: "0954-20-1234", address: "佐賀県武雄市武雄町昭和1-5", date: "2025/11/01" },
-  { id: "C-00012", type: "個人", name: "渡辺 一郎", furigana: "ワタナベ イチロウ", tel: "090-5678-1234", address: "佐賀県鳥栖市京町1-2-3", date: "2025/10/20" },
-  { id: "C-00013", type: "法人", name: "株式会社 西日本ビル管理", furigana: "カブシキガイシャ ニシニホンビルカンリ", tel: "092-888-3344", address: "福岡県福岡市東区箱崎1-5-10", date: "2025/10/05" },
-  { id: "C-00014", type: "個人", name: "中村 さくら", furigana: "ナカムラ サクラ", tel: "080-6789-2345", address: "長崎県大村市桜馬場2-1-3", date: "2025/09/28" },
-  { id: "C-00015", type: "法人", name: "合同会社 肥前総合サービス", furigana: "ゴウドウガイシャ ヒゼンソウゴウサービス", tel: "0952-40-5566", address: "佐賀県佐賀市大和町大字尼寺1-2", date: "2025/09/15" },
-  { id: "C-00016", type: "個人", name: "小林 結衣", furigana: "コバヤシ ユイ", tel: "090-7890-3456", address: "福岡県福岡市南区大橋4-2-1", date: "2025/09/01" },
-  { id: "C-00017", type: "法人", name: "株式会社 有明建装", furigana: "カブシキガイシャ アリアケケンソウ", tel: "0944-62-7788", address: "福岡県大牟田市有明町2-3-4", date: "2025/08/20" },
-  { id: "C-00018", type: "個人", name: "加藤 陽菜", furigana: "カトウ ヒナ", tel: "080-8901-4567", address: "佐賀県小城市三日月町久米1234", date: "2025/08/10" },
-  { id: "C-00019", type: "法人", name: "有限会社 嬉野温泉観光", furigana: "ユウゲンガイシャ ウレシノオンセンカンコウ", tel: "0954-43-1122", address: "佐賀県嬉野市嬉野町大字下宿甲4100", date: "2025/07/25" },
-  { id: "C-00020", type: "個人", name: "佐藤 次郎", furigana: "サトウ ジロウ", tel: "090-2345-6780", address: "長崎県諫早市栄田町1-1-1", date: "2025/07/10" },
-]
 
 // ========================
 // Form Component
@@ -64,6 +48,11 @@ function CustomerForm({
   const [furigana, setFurigana] = useState(customer?.furigana || "")
   const [tel, setTel] = useState(customer?.tel || "")
   const [address, setAddress] = useState(customer?.address || "")
+  const [contactPerson, setContactPerson] = useState(customer?.contactPerson || "")
+  const [contactPersonTel, setContactPersonTel] = useState(customer?.contactPersonTel || "")
+  const [referee, setReferee] = useState(customer?.referee || "")
+  const [refereeTel, setRefereeTel] = useState(customer?.refereeTel || "")
+  const [memo, setMemo] = useState(customer?.memo || "")
   const id = customer?.id || `C-${Math.floor(Math.random() * 90000 + 10000)}`
 
   const handleSave = () => {
@@ -78,6 +67,11 @@ function CustomerForm({
       furigana,
       tel,
       address,
+      contactPerson,
+      contactPersonTel,
+      referee,
+      refereeTel,
+      memo,
     })
   }
 
@@ -134,6 +128,47 @@ function CustomerForm({
               <Input value={address} onChange={e => setAddress(e.target.value)} placeholder="福岡県福岡市博多区..." className="h-11" />
             </div>
           </div>
+
+          <hr className="border-gray-200" />
+          <h4 className="text-base font-bold text-gray-900 border-l-4 border-indigo-500 pl-3">担当者情報</h4>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-gray-700">担当者名</Label>
+              <Input value={contactPerson} onChange={e => setContactPerson(e.target.value)} placeholder="例：田中 一郎" className="h-11" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-gray-700">担当者電話番号</Label>
+              <Input type="tel" value={contactPersonTel} onChange={e => setContactPersonTel(e.target.value)} placeholder="例：080-0000-0000" className="h-11" />
+            </div>
+          </div>
+
+          <hr className="border-gray-200" />
+          <h4 className="text-base font-bold text-gray-900 border-l-4 border-emerald-500 pl-3">紹介者情報</h4>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-gray-700">紹介者名</Label>
+              <Input value={referee} onChange={e => setReferee(e.target.value)} placeholder="例：佐藤 花子" className="h-11" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-gray-700">紹介者電話番号</Label>
+              <Input type="tel" value={refereeTel} onChange={e => setRefereeTel(e.target.value)} placeholder="例：090-1111-2222" className="h-11" />
+            </div>
+          </div>
+
+          <hr className="border-gray-200" />
+          <h4 className="text-base font-bold text-gray-900 border-l-4 border-amber-500 pl-3">メモ</h4>
+
+          <div className="space-y-2">
+            <textarea
+              value={memo}
+              onChange={e => setMemo(e.target.value)}
+              placeholder="備考・特記事項など自由に入力してください..."
+              rows={4}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+            />
+          </div>
         </div>
       </div>
 
@@ -154,9 +189,11 @@ function CustomerForm({
 }
 
 // ========================
-// Main Page
+// Main Page Content
 // ========================
-export default function CustomersPage() {
+function CustomersContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -172,11 +209,20 @@ export default function CustomersPage() {
     getCustomers().then(data => {
       setCustomers(data)
       setIsLoading(false)
+
+      const editId = searchParams.get('editId')
+      if (editId) {
+        const target = data.find(c => c.id === editId)
+        if (target) {
+          setEditingCustomer(target)
+          setView("form")
+        }
+      }
     }).catch(err => {
       console.error(err)
       setIsLoading(false)
     })
-  }, [])
+  }, [searchParams])
 
   // Filter customers
   const filtered = useMemo(() => {
@@ -196,6 +242,12 @@ export default function CustomersPage() {
   const startIndex = (currentPage - 1) * itemsPerPage
   const currentItems = filtered.slice(startIndex, startIndex + itemsPerPage)
 
+  const handleRowClick = (id: string, e: React.MouseEvent) => {
+    // 編集ボタン等を押したときは遷移させない
+    if ((e.target as HTMLElement).closest('button')) return;
+    router.push(`/customers/${id}`);
+  }
+
   const handleEdit = (customer: Customer) => {
     setEditingCustomer(customer)
     setView("form")
@@ -207,8 +259,13 @@ export default function CustomersPage() {
   }
 
   const handleBack = () => {
-    setView("list")
-    setEditingCustomer(null)
+    const editId = searchParams.get("editId")
+    if (editId) {
+      router.push(`/customers/${editId}`)
+    } else {
+      setView("list")
+      setEditingCustomer(null)
+    }
   }
 
   const handleSave = async (customerInput: CustomerInput) => {
@@ -229,6 +286,10 @@ export default function CustomersPage() {
       }
       setView("list")
       setEditingCustomer(null)
+      const editId = searchParams.get("editId")
+      if (editId) {
+        router.push(`/customers/${editId}`)
+      }
     } catch (error) {
       alert("保存に失敗しました。")
     } finally {
@@ -314,8 +375,17 @@ export default function CustomersPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {currentItems.map(c => (
-                      <tr key={c.id} className="bg-white hover:bg-blue-50/50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-gray-900 font-mono">{c.id}</td>
+                      <tr
+                        key={c.id}
+                        className="bg-white hover:bg-blue-50/50 transition-colors cursor-pointer group"
+                        onClick={(e) => handleRowClick(c.id, e)}
+                      >
+                        <td className="px-6 py-4 font-medium text-gray-900 font-mono group-hover:text-blue-600 transition-colors">
+                          <div className="flex items-center gap-2">
+                            {c.id}
+                            <ExternalLink className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                        </td>
                         <td className="px-6 py-4">
                           <div className="font-bold text-base text-gray-900 line-clamp-1" title={c.name}>{c.name}</div>
                           <div className="flex items-center gap-2 mt-1">
@@ -394,3 +464,16 @@ export default function CustomersPage() {
   )
 }
 
+export default function CustomersPage() {
+  return (
+    <Suspense fallback={
+      <AppLayout>
+        <div className="flex h-full items-center justify-center p-8">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        </div>
+      </AppLayout>
+    }>
+      <CustomersContent />
+    </Suspense>
+  )
+}

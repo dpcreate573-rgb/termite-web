@@ -14,7 +14,11 @@ export interface CustomerInput {
     furigana?: string | null;
     tel?: string | null;
     address?: string | null;
-    createdAt?: string; // Formated date in UI, but DB uses integer/Date. We'll handle it nicely.
+    contactPerson?: string | null;
+    contactPersonTel?: string | null;
+    referee?: string | null;
+    refereeTel?: string | null;
+    memo?: string | null;
 }
 
 export async function getCustomers() {
@@ -32,11 +36,47 @@ export async function getCustomers() {
             furigana: c.furigana,
             tel: c.tel,
             address: c.address,
+            contactPerson: c.contactPerson,
+            contactPersonTel: c.contactPersonTel,
+            referee: c.referee,
+            refereeTel: c.refereeTel,
+            memo: c.memo,
             date: new Date(c.createdAt).toISOString().split("T")[0].replace(/-/g, "/"),
         }));
     } catch (error) {
         console.error("Failed to fetch customers:", error);
         throw new Error("顧客データの取得に失敗しました");
+    }
+}
+
+export async function getCustomerById(id: string) {
+    try {
+        const result = await db
+            .select()
+            .from(customers)
+            .where(eq(customers.id, id))
+            .limit(1);
+
+        if (result.length === 0) return null;
+
+        const c = result[0];
+        return {
+            id: c.id,
+            type: c.type as CustomerType,
+            name: c.name,
+            furigana: c.furigana,
+            tel: c.tel,
+            address: c.address,
+            contactPerson: c.contactPerson,
+            contactPersonTel: c.contactPersonTel,
+            referee: c.referee,
+            refereeTel: c.refereeTel,
+            memo: c.memo,
+            date: new Date(c.createdAt).toISOString().split("T")[0].replace(/-/g, "/"),
+        };
+    } catch (error) {
+        console.error("Failed to fetch customer:", error);
+        throw new Error("顧客の取得に失敗しました");
     }
 }
 
@@ -49,6 +89,11 @@ export async function createCustomer(data: CustomerInput) {
             furigana: data.furigana || null,
             tel: data.tel || null,
             address: data.address || null,
+            contactPerson: data.contactPerson || null,
+            contactPersonTel: data.contactPersonTel || null,
+            referee: data.referee || null,
+            refereeTel: data.refereeTel || null,
+            memo: data.memo || null,
             createdAt: new Date(),
         });
 
@@ -70,6 +115,11 @@ export async function updateCustomer(data: CustomerInput) {
                 furigana: data.furigana || null,
                 tel: data.tel || null,
                 address: data.address || null,
+                contactPerson: data.contactPerson || null,
+                contactPersonTel: data.contactPersonTel || null,
+                referee: data.referee || null,
+                refereeTel: data.refereeTel || null,
+                memo: data.memo || null,
             })
             .where(eq(customers.id, data.id));
 

@@ -11,17 +11,19 @@ export interface LineItem {
 }
 
 interface QuotePreviewContentProps {
+  customerName?: string
   totalA: number
   totalB: number
   totalC: number
   grandTotal: number
-  itemsA?: LineItem[]
-  itemsB?: LineItem[]
-  itemsC?: LineItem[]
+  itemsA: any[]
+  itemsB: any[]
+  itemsC: any[]
 }
 
 export const QuotePreviewContent = memo(function QuotePreviewContent({
-  totalA, totalB, totalC, grandTotal, itemsA = [], itemsB = [], itemsC = []
+  customerName = "御中",
+  totalA, totalB, totalC, grandTotal, itemsA, itemsB, itemsC
 }: QuotePreviewContentProps) {
   const tax = Math.floor(grandTotal * 0.10)
   const totalWithTax = grandTotal + tax
@@ -37,7 +39,7 @@ export const QuotePreviewContent = memo(function QuotePreviewContent({
 
   return (
     <div className="w-[210mm] h-[297mm] mx-auto bg-white px-[15mm] pt-[12mm] pb-[10mm] flex flex-col text-[12px] text-gray-800 overflow-hidden origin-top">
-      
+
       {/* Header */}
       <header className="flex justify-between items-center mb-4">
         <p className="w-1/4">No. <span className="text-sm">—</span></p>
@@ -52,14 +54,14 @@ export const QuotePreviewContent = memo(function QuotePreviewContent({
         <section className="w-[58%]">
           <h2 className="text-xl font-normal leading-tight mb-4">
             <small className="text-[0.7em] block mb-1">&nbsp;</small>
-            &nbsp;<span className="text-lg ml-1">様</span>
+            {customerName}<span className="text-lg ml-1">様</span>
           </h2>
           <div className="mb-2 w-full border-b border-gray-300 pb-1">
             <p className="text-sm">件名：<span className="text-[1.1em]">&nbsp;</span></p>
           </div>
           <p className="my-1">有効期限：<span>&nbsp;</span></p>
           <p className="my-1">下記の通り御見積り申し上げます。</p>
-          
+
           <div className="flex items-center bg-[#F3F8F0] border-y border-gray-300 px-5 py-1.5 mt-3 w-full">
             <p>御見積金額</p>
             <h3 className="ml-4 text-2xl font-normal tracking-wide">¥{totalWithTax.toLocaleString()} -</h3>

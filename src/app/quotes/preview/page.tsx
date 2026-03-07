@@ -5,11 +5,14 @@ import { useState, useEffect } from "react"
 import { QuotePreviewContent } from "@/components/quotes/QuotePreviewContent"
 
 interface QuoteData {
-  types: string[]
+  customerName?: string
   totalA: number
   totalB: number
   totalC: number
   grandTotal: number
+  itemsA: any[]
+  itemsB: any[]
+  itemsC: any[]
 }
 
 export default function QuotePreviewPage() {
@@ -35,14 +38,19 @@ export default function QuotePreviewPage() {
 
       <div className="page-wrapper shadow-lg print:shadow-none print:m-0">
         <QuotePreviewContent
+          customerName={data.customerName}
           totalA={data.totalA}
           totalB={data.totalB}
           totalC={data.totalC}
           grandTotal={data.grandTotal}
+          itemsA={data.itemsA || []}
+          itemsB={data.itemsB || []}
+          itemsC={data.itemsC || []}
         />
       </div>
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @media print {
           html, body {
             margin: 0 !important;

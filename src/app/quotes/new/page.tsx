@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation"
@@ -20,14 +21,18 @@ function NewQuoteForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [types, setTypes] = useState<string[]>([])
-  
+
+  // 顧客情報
+  const [customerId, setCustomerId] = useState<string | null>(null)
+  const [customerName, setCustomerName] = useState<string>("")
+
   const [totalA, setTotalA] = useState(0)
   const [totalB, setTotalB] = useState(0)
   const [totalC, setTotalC] = useState(0)
   const [itemsA, setItemsA] = useState<any[]>([])
   const [itemsB, setItemsB] = useState<any[]>([])
   const [itemsC, setItemsC] = useState<any[]>([])
-  
+
   const [isUploading, setIsUploading] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
 
@@ -38,11 +43,16 @@ function NewQuoteForm() {
     } else if (typeParam) {
       setTypes([typeParam])
     }
+
+    const cid = searchParams.get('customerId')
+    const cname = searchParams.get('customerName')
+    if (cid) setCustomerId(cid)
+    if (cname) setCustomerName(cname)
   }, [searchParams])
 
   const toggleType = (typeValue: string) => {
-    setTypes(current => 
-      current.includes(typeValue) 
+    setTypes(current =>
+      current.includes(typeValue)
         ? current.filter(t => t !== typeValue)
         : [...current, typeValue]
     )
@@ -67,7 +77,7 @@ function NewQuoteForm() {
     // keeping this for the backend save function
     const { QuotePDF } = await import('@/components/pdf/QuotePDF')
     const { pdf, Document } = await import('@react-pdf/renderer')
-    
+
     const doc = <QuotePDF data={{ types, totalA, totalB, totalC, grandTotal }} />
     const asPdf = pdf(<Document />) // Workaround to initialize
     asPdf.updateContainer(doc)
@@ -84,7 +94,7 @@ function NewQuoteForm() {
     try {
       const blob = await generatePdfBlob()
       const file = new File([blob], 'quote.pdf', { type: 'application/pdf' })
-      
+
       const formData = new FormData()
       formData.append('file', file)
 
@@ -92,7 +102,7 @@ function NewQuoteForm() {
         method: 'POST',
         body: formData
       })
-      
+
       const result = await res.json()
       if (res.ok) {
         alert("見積データの保存およびPDFアップロードに成功しました！\nURL: " + result.url)
@@ -113,6 +123,22 @@ function NewQuoteForm() {
       <div className="flex justify-between items-center border-b pb-4">
         <h1 className="text-2xl md:text-3xl font-bold">新規見積作成</h1>
         <Button variant="outline" onClick={() => window.history.back()}>戻る</Button>
+      </div>
+
+      <div className="bg-white p-6 rounded-lg shadow-sm border space-y-4">
+        <h2 className="text-xl font-semibold">基本情報</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="customerName">宛名（お客様名・貴社名）</Label>
+            <Input
+              id="customerName"
+              value={customerName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomerName(e.target.value)}
+              placeholder="例: 株式会社サンプル"
+            />
+            {customerId && <p className="text-xs text-gray-500 mt-1">顧客コード: {customerId} が連携されています</p>}
+          </div>
+        </div>
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-sm border space-y-4">
@@ -204,7 +230,7 @@ function NewQuoteForm() {
                 </p>
               </div>
             </div>
-            
+
             <div className="mt-8 flex justify-end gap-4 border-t border-gray-200 pt-6">
               <Button variant="outline" size="lg" className="w-full md:w-auto" onClick={handlePreview}>プレビュー (PDF)</Button>
               <Button size="lg" className="w-full md:w-48 text-md font-semibold shadow-sm" onClick={handleSaveAndUpload} disabled={isUploading}>
@@ -239,6 +265,7 @@ function NewQuoteForm() {
             <div className="origin-top" style={{ transform: 'scale(0.62)', transformOrigin: 'top center' }}>
               <div className="shadow-lg border border-gray-300 rounded overflow-hidden">
                 <QuotePreviewContent
+                  customerName={customerName}
                   totalA={totalA}
                   totalB={totalB}
                   totalC={totalC}
