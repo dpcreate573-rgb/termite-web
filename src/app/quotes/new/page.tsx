@@ -16,6 +16,7 @@ import { QuoteFormB } from "@/components/quotes/QuoteFormB"
 import { QuoteFormC } from "@/components/quotes/QuoteFormC"
 import { QuotePreviewContent, type LineItem } from "@/components/quotes/QuotePreviewContent"
 import { Suspense } from "react"
+import { createQuoteAction } from "../actions"
 
 // type definition for local customer data
 type CustomerMin = {
@@ -53,14 +54,15 @@ function NewQuoteForm() {
   const [itemsB, setItemsB] = useState<LineItem[]>([])
   const [itemsC, setItemsC] = useState<LineItem[]>([])
 
-  const [isUploading, setIsUploading] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
 
   useEffect(() => {
     const typeParam = searchParams.get('type')
     if (typeParam === 'ABC') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTypes(['A', 'B', 'C'])
     } else if (typeParam) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTypes([typeParam])
     }
 
@@ -123,9 +125,10 @@ function NewQuoteForm() {
     if (!subject.trim()) return;
 
     const keywordsA = ["シロアリ", "白蟻", "しろあり", "防除", "予防"];
-    const keywordsB = ["ハチ", "蜂", "ゴキブリ", "ネズミ", "鼠", "ダニ", "ノミ", "害虫", "駆除", "コウモリ", "ハクビシン"];
+    const keywordsB = ["ハチ", "蜂", "ゴキブリ", "ネズミ", "鼠", "ダニ", "ノミ", "害虫", "コウモリ", "ハクビシン"];
     const keywordsC = ["点検", "床下", "換気扇", "調湿", "物販", "販売"];
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTypes(current => {
       const newTypes = [...current];
       let changed = false;
@@ -170,48 +173,45 @@ function NewQuoteForm() {
     return t;
   }, [types, totalA, totalB, totalC]);
 
-  const generatePdfBlob = async () => {
-    // keeping this for the backend save function
-    const { QuotePDF } = await import('@/components/pdf/QuotePDF')
-    const { pdf, Document } = await import('@react-pdf/renderer')
-
-    const doc = <QuotePDF data={{ types, totalA, totalB, totalC, grandTotal }} />
-    const asPdf = pdf(<Document />) // Workaround to initialize
-    asPdf.updateContainer(doc)
-    const blob = await asPdf.toBlob()
-    return blob
-  }
-
-  const handlePreview = () => {
-    setShowPreview(true)
-  }
+  const [isSaving, setIsSaving] = useState(false)
 
   const handleSaveAndUpload = async () => {
-    setIsUploading(true)
+    if (!customerName || !subject) {
+      alert("宛名と件名を入力してください");
+      return;
+    }
+
+    setIsSaving(true);
     try {
-      const blob = await generatePdfBlob()
-      const file = new File([blob], 'quote.pdf', { type: 'application/pdf' })
+      const result = await createQuoteAction({
+        quoteId,
+        customerId,
+        customerName,
+        subject,
+        projectTypes: types,
+        itemsA,
+        itemsB,
+        itemsC
+      });
 
-      const formData = new FormData()
-      formData.append('file', file)
+      if (result.success) {
+        // 保存成功
+        const previewData = {
+          types, totalA, totalB, totalC, grandTotal,
+          customerId, customerName, subject, quoteId,
+          itemsA, itemsB, itemsC
+        };
+        localStorage.setItem('quotePreviewData', JSON.stringify(previewData));
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      })
-
-      const result = await res.json()
-      if (res.ok) {
-        alert("見積データの保存およびPDFアップロードに成功しました！\nURL: " + result.url)
-        // Here, normally we would save the DB record (Drizzle/Turso) then redirect
-      } else {
-        alert("アップロード失敗: " + result.error)
+        alert("見積書を保存しました");
+        // 見積一覧へ戻る
+        window.location.href = '/quotes';
       }
-    } catch (e) {
-      console.error("Upload Error:", e)
-      alert("保存処理中にエラーが発生しました")
+    } catch (error) {
+      console.error("Failed to save quote:", error);
+      alert("保存に失敗しました。もう一度お試しください。");
     } finally {
-      setIsUploading(false)
+      setIsSaving(false);
     }
   }
 
@@ -396,9 +396,9 @@ function NewQuoteForm() {
             </div>
 
             <div className="mt-8 flex justify-end gap-4 border-t border-gray-200 pt-6">
-              <Button variant="outline" size="lg" className="w-full md:w-auto" onClick={handlePreview}>プレビュー (PDF)</Button>
-              <Button size="lg" className="w-full md:w-48 text-md font-semibold shadow-sm" onClick={handleSaveAndUpload} disabled={isUploading}>
-                {isUploading ? "保存中..." : "見積を保存して進む"}
+              <Button variant="outline" size="lg" className="w-full md:w-auto" onClick={() => setShowPreview(true)}>プレビュー (PDF)</Button>
+              <Button size="lg" className="w-full md:w-48 text-md font-semibold shadow-sm" onClick={handleSaveAndUpload} disabled={isSaving}>
+                {isSaving ? "保存中..." : "見積を保存して完了"}
               </Button>
             </div>
           </CardContent>
@@ -431,7 +431,9 @@ function NewQuoteForm() {
           <div className="flex-1 overflow-y-auto bg-gray-400 py-6">
             <div className="shadow-2xl border border-gray-300 rounded overflow-hidden mx-auto w-fit">
               <QuotePreviewContent
+                quoteId={quoteId}
                 customerName={customerName}
+                subject={subject}
                 totalA={totalA}
                 totalB={totalB}
                 totalC={totalC}
