@@ -33,13 +33,16 @@ export async function POST(req: Request) {
     });
 
     console.log('Sending command to S3 Client...');
-    await s3Client.send(command);
+    try {
+      await s3Client.send(command);
+    } catch (s3Error) {
+      console.error('S3 Client Send Error:', s3Error);
+      throw s3Error;
+    }
     console.log('Upload successful!');
 
-    // Provide the public URL or key back to the client
-    // Note: R2 Endpoint should be used with the bucket name in the path if needed,
-    // but here we just return the key and a temporary URL.
-    const fileUrl = `${process.env.R2_ENDPOINT!}/${process.env.R2_BUCKET_NAME!}/${fileName}`;
+    // パブリックURLではなく、プロキシAPI経由のURLを返す
+    const fileUrl = `/api/settings/image?key=${fileName}`;
 
     return NextResponse.json({ success: true, url: fileUrl, key: fileName });
   } catch (error) {

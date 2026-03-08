@@ -243,7 +243,23 @@ export default function SettingsPage() {
                                                     className={`h-[120px] bg-gray-50 flex flex-col items-center justify-center cursor-pointer transition-all border-2 border-dashed border-gray-200 rounded-lg hover:bg-blue-50/50 hover:border-blue-400 group overflow-hidden relative ${uploadingLogo ? 'opacity-50' : ''}`}
                                                 >
                                                     {formData.logoUrl ? (
-                                                        <img src={formData.logoUrl} alt="Logo" className="h-full w-full object-contain p-4" />
+                                                        <div className="relative h-full w-full group">
+                                                            <img
+                                                                src={formData.logoUrl.startsWith('settings/') ? `/api/settings/image?key=${formData.logoUrl}` : formData.logoUrl}
+                                                                alt="Logo"
+                                                                className="h-full w-full object-contain p-4"
+                                                            />
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setFormData((prev: any) => ({ ...prev, logoUrl: "" }));
+                                                                }}
+                                                                className="absolute top-2 right-2 bg-red-100 text-red-600 p-1.5 rounded-full hover:bg-red-200 transition-colors opacity-0 group-hover:opacity-100 shadow-sm"
+                                                                title="画像を削除"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
                                                     ) : (
                                                         <>
                                                             <ImagePlus className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
@@ -265,7 +281,23 @@ export default function SettingsPage() {
                                                     className={`h-[120px] bg-gray-50 flex flex-col items-center justify-center cursor-pointer transition-all border-2 border-dashed border-gray-200 rounded-lg hover:bg-blue-50/50 hover:border-blue-400 group overflow-hidden relative ${uploadingStamp ? 'opacity-50' : ''}`}
                                                 >
                                                     {formData.stampUrl ? (
-                                                        <img src={formData.stampUrl} alt="Stamp" className="h-full w-full object-contain p-4" />
+                                                        <div className="relative h-full w-full group">
+                                                            <img
+                                                                src={formData.stampUrl.startsWith('settings/') ? `/api/settings/image?key=${formData.stampUrl}` : formData.stampUrl}
+                                                                alt="Stamp"
+                                                                className="h-full w-full object-contain p-4"
+                                                            />
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setFormData((prev: any) => ({ ...prev, stampUrl: "" }));
+                                                                }}
+                                                                className="absolute top-2 right-2 bg-red-100 text-red-600 p-1.5 rounded-full hover:bg-red-200 transition-colors opacity-0 group-hover:opacity-100 shadow-sm"
+                                                                title="画像を削除"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
                                                     ) : (
                                                         <>
                                                             <Stamp className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
