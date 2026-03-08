@@ -67,3 +67,38 @@ export const items = sqliteTable("items", {
   remarks: text("remarks"),
   createdAt: integer("created_at", { mode: 'timestamp' }).notNull(),
 });
+
+export const settings = sqliteTable("settings", {
+  id: text("id").primaryKey(), // 常に "system_settings" とする
+  companyName: text("company_name").notNull(),
+  representative: text("representative"),
+  accreditationNumber: text("accreditation_number"), // 認定番号
+  zipCode: text("zip_code"),
+  address: text("address"),
+  tel: text("tel"),
+  fax: text("fax"),
+  logoUrl: text("logo_url"),
+  stampUrl: text("stamp_url"), // 印影URL
+  bankAccount1: text("bank_account1"),
+  bankAccount2: text("bank_account2"),
+  prMessage: text("pr_message"),
+  // メール送信設定 (暗号化などは別途考慮)
+  smtpHost: text("smtp_host"),
+  smtpPort: integer("smtp_port"),
+  smtpUser: text("smtp_user"),
+  smtpPass: text("smtp_pass"),
+  emailFrom: text("email_from"),
+  // メールテンプレート
+  quoteEmailTemplate: text("quote_email_template"),
+  invoiceEmailTemplate: text("invoice_email_template"),
+  updatedAt: integer("updated_at", { mode: 'timestamp' }).notNull(),
+});
+
+// ログイン許可ユーザーを管理するテーブル (Google Auth用)
+export const allowedUsers = sqliteTable("allowed_users", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name"),
+  role: text("role").notNull(), // "admin" | "user"
+  createdAt: integer("created_at", { mode: 'timestamp' }).notNull(),
+});

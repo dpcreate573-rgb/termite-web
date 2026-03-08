@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termite Web - 設定</title>
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+        }
+
+        /* タブコンテンツの切り替え用クラス */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 画像アップロード枠のアニメーション */
+        .dashed-border {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='%23CBD5E1' stroke-width='2' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+            border-radius: 8px;
+        }
+
+        .dashed-border:hover {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='%233B82F6' stroke-width='2' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 h-screen flex overflow-hidden">
+
+    <!-- 左サイドバー (Sidebar.tsxのデザインを再現) -->
+    <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col h-full shrink-0">
+        <!-- Logo -->
+        <div class="p-6 border-b border-gray-200 shrink-0">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <span class="bg-blue-600 text-white p-1.5 rounded-md flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </span>
+                Termite Web
+            </h1>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <a href="#"
+                class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                ダッシュボード
+            </a>
+
+            <div>
+                <button
+                    class="flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-md transition-colors text-left text-gray-600 hover:bg-gray-100">
+                    <span class="flex items-center gap-3">
+                        <i data-lucide="file-box" class="w-5 h-5"></i>
+                        見積書管理
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                </button>
+                <div class="ml-5 mt-1 space-y-0.5 border-l-2 border-gray-100 pl-3">
+                    <a href="#"
+                        class="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 rounded-md transition-colors">
+                        <i data-lucide="file-box" class="w-4 h-4"></i>
+                        見積書一覧表示
+                    </a>
+                    <a href="#"
+                        class="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 rounded-md transition-colors">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        見積書新規作成
+                    </a>
+                </div>
+            </div>
+
+            <a href="#"
+                class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
+                <i data-lucide="receipt" class="w-5 h-5"></i>
+                請求書管理
+            </a>
+            <a href="#"
+                class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                保証書管理
+            </a>
+
+            <div class="my-4 border-t border-gray-200" />
+
+            <a href="#"
+                class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                顧客マスター
+            </a>
+            <a href="#"
+                class="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                施工品目マスター
+            </a>
+        </nav>
+
+        <!-- Bottom section -->
+        <div class="p-4 border-t border-gray-200 shrink-0 space-y-1">
+            <div class="px-3 py-2 text-xs text-gray-400 truncate">admin@example.com</div>
+            <a href="#"
+                class="flex items-center gap-3 px-3 py-2 bg-blue-50 text-blue-700 font-medium rounded-md transition-colors">
+                <i data-lucide="settings" class="w-5 h-5"></i> 設定
+            </a>
+            <button
+                class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors w-full text-left">
+                <i data-lucide="log-out" class="w-5 h-5"></i> ログアウト
+            </button>
+        </div>
+    </aside>
+
+    <!-- メインコンテンツ (settings.htmlの内容を忠実に再現) -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <div class="flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-5xl mx-auto space-y-6 pb-24">
+
+                <!-- ヘッダー -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold">システム設定</h2>
+                        <p class="text-sm text-gray-500 mt-1">自社情報やシステムの基本設定を行います。</p>
+                    </div>
+                    <div>
+                        <button onclick="saveSettings()"
+                            class="inline-flex items-center justify-center rounded-md font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 py-2 px-6 shadow-sm transition-colors w-full md:w-auto">
+                            <i data-lucide="save" class="w-4 h-4 mr-2"></i> 設定を保存する
+                        </button>
+                    </div>
+                </div>
+
+                <!-- メインカード -->
+                <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+
+                    <!-- タブナビゲーション -->
+                    <div class="border-b border-gray-200 bg-gray-50/80 px-4 flex overflow-x-auto hide-scrollbar">
+                        <button
+                            class="tab-btn active border-b-2 border-blue-600 text-blue-700 font-semibold px-4 py-4 text-sm whitespace-nowrap transition-colors"
+                            data-target="tab-company">
+                            <i data-lucide="building-2" class="w-4 h-4 inline-block mr-1.5 mb-0.5"></i>自社情報・基本設定
+                        </button>
+                        <button
+                            class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium px-4 py-4 text-sm whitespace-nowrap transition-colors"
+                            data-target="tab-system">
+                            <i data-lucide="laptop" class="w-4 h-4 inline-block mr-1.5 mb-0.5"></i>システム・メール設定
+                        </button>
+                        <button
+                            class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium px-4 py-4 text-sm whitespace-nowrap transition-colors"
+                            data-target="tab-users">
+                            <i data-lucide="users-2" class="w-4 h-4 inline-block mr-1.5 mb-0.5"></i>ログインユーザー管理
+                        </button>
+                    </div>
+
+                    <div class="p-6 md:p-8">
+
+                        <!-- ========================================== -->
+                        <!-- タブ1: 自社情報・基本設定 -->
+                        <!-- ========================================== -->
+                        <div id="tab-company" class="tab-content active space-y-8">
+
+                            <h3 class="text-lg font-bold border-l-4 border-blue-600 pl-3">会社情報 (見積書・請求書に印字されます)</h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2 md:col-span-2">
+                                    <label class="text-sm font-semibold text-gray-700">自社名 <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" value="総合衛研工業 SÖGEN"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-lg font-medium focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">代表者名</label>
+                                    <input type="text" value="代表 野口 広満"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">認定番号など (保証書項目)</label>
+                                    <input type="text" placeholder="(社)日本しろあり対策協会認定 第〇〇号"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">郵便番号</label>
+                                    <input type="text" value="843-0021"
+                                        class="flex h-11 w-full md:w-1/2 rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="hidden md:block"></div> <!-- スペーサー -->
+                                <div class="space-y-2 md:col-span-2">
+                                    <label class="text-sm font-semibold text-gray-700">住所</label>
+                                    <input type="text" value="佐賀県武雄市武雄町永島14704-14"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">電話番号</label>
+                                    <input type="tel" value="0954-23-7334"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">FAX番号</label>
+                                    <input type="tel" value="0954-23-7704"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+
+                            <hr class="border-gray-200">
+
+                            <h3 class="text-lg font-bold border-l-4 border-blue-600 pl-3">ロゴ・印影画像</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">会社ロゴ</label>
+                                    <div
+                                        class="dashed-border h-[120px] bg-gray-50 flex flex-col items-center justify-center cursor-pointer transition-colors hover:bg-blue-50/50">
+                                        <i data-lucide="image-plus" class="w-6 h-6 text-blue-500 mb-2"></i>
+                                        <p class="text-sm text-gray-500">クリックしてアップロード</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">社印（印影画像）</label>
+                                    <div
+                                        class="dashed-border h-[120px] bg-gray-50 flex flex-col items-center justify-center cursor-pointer transition-colors hover:bg-blue-50/50">
+                                        <i data-lucide="stamp" class="w-6 h-6 text-blue-500 mb-2"></i>
+                                        <p class="text-sm text-gray-500">クリックしてアップロード</p>
+                                        <p class="text-xs text-gray-400 mt-1">※背景が透明なPNG推奨</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-gray-200">
+
+                            <h3 class="text-lg font-bold border-l-4 border-blue-600 pl-3">振込先・PR情報 (請求書等に印字されます)</h3>
+                            <div class="grid grid-cols-1 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">振込先銀行 1</label>
+                                    <input type="text" placeholder="例：〇〇銀行 △△支店 普通 1234567 総合衛研工業"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">振込先銀行 2</label>
+                                    <input type="text" placeholder=""
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">PR欄 (見積書下部の案内文)</label>
+                                    <textarea
+                                        class="flex min-h-[120px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500 leading-relaxed resize-y">総合衛研工業は、住みよい環境と安全な暮らし作りをお手伝いする害虫駆除の専門業者です。
+各所に発生した、シロアリ、ダニ、ゴキブリ、ハチ等を防除・消毒いたします。
+また、床下換気システムなど住宅設備の工事も承っております。</textarea>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- ========================================== -->
+                        <!-- タブ2: システム・メール設定 -->
+                        <!-- ========================================== -->
+                        <div id="tab-system" class="tab-content space-y-8">
+
+                            <h3 class="text-lg font-bold border-l-4 border-gray-800 pl-3">メール送信設定 (SMTP)</h3>
+                            <p class="text-sm text-gray-500">システムから直接見積書や請求書をメール送信するための設定です。</p>
+
+                            <div
+                                class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-lg border border-gray-200">
+                                <div class="space-y-2 md:col-span-2">
+                                    <label class="text-sm font-semibold text-gray-700">送信元メールアドレス</label>
+                                    <input type="email" value="soken.noguchi@gmail.com"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">送信SMTPサーバー</label>
+                                    <input type="text" placeholder="smtp.gmail.com"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">サーバーポート</label>
+                                    <input type="text" placeholder="465 または 587"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="space-y-2 md:col-span-2">
+                                    <label class="text-sm font-semibold text-gray-700">SMTP パスワード (またはアプリパスワード)</label>
+                                    <input type="password" placeholder="••••••••••••"
+                                        class="flex h-11 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="md:col-span-2 pt-2">
+                                    <button
+                                        class="inline-flex items-center justify-center rounded-md font-medium border border-gray-300 bg-white hover:bg-gray-100 h-10 px-4 text-sm transition-colors">
+                                        <i data-lucide="mail" class="w-4 h-4 mr-2"></i> テストメールを送信
+                                    </button>
+                                </div>
+                            </div>
+
+                            <hr class="border-gray-200">
+
+                            <h3 class="text-lg font-bold border-l-4 border-gray-800 pl-3">メール定型文 (テンプレート)</h3>
+
+                            <div class="space-y-6">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">見積書 送信時のメッセージ</label>
+                                    <textarea
+                                        class="flex min-h-[100px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 resize-y">いつもお世話になっております。総合衛研工業です。
+ご依頼いただきました見積書をPDFにて添付いたします。
+内容をご確認いただき、ご不明な点がございましたらご連絡ください。</textarea>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-semibold text-gray-700">請求書 送信時のメッセージ</label>
+                                    <textarea
+                                        class="flex min-h-[100px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 resize-y">いつもお世話になっております。総合衛研工業です。
+施工が完了いたしましたので、請求書をPDFにて添付いたします。
+記載の期日までにお振込みいただきますようお願い申し上げます。</textarea>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- ========================================== -->
+                        <!-- タブ3: ログインユーザー管理 -->
+                        <!-- ========================================== -->
+                        <div id="tab-users" class="tab-content space-y-6">
+
+                            <div class="flex justify-between items-center border-l-4 border-gray-800 pl-3">
+                                <h3 class="text-lg font-bold">システムを利用できるユーザー</h3>
+                                <button
+                                    class="inline-flex items-center justify-center rounded-md font-medium border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 h-9 px-3 text-sm transition-colors">
+                                    <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i> ユーザーを追加
+                                </button>
+                            </div>
+
+                            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                <table class="w-full text-sm text-left">
+                                    <thead class="bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th class="px-6 py-3 font-semibold text-gray-600">名前</th>
+                                            <th class="px-6 py-3 font-semibold text-gray-600">ログインメールアドレス (Google アカウント)
+                                            </th>
+                                            <th class="px-6 py-3 font-semibold text-gray-600">権限</th>
+                                            <th class="px-6 py-3 font-semibold text-center">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 bg-white">
+                                        <tr>
+                                            <td class="px-6 py-4 font-bold text-gray-900">管理者 (あなた)</td>
+                                            <td class="px-6 py-4 text-gray-600">admin@example.com</td>
+                                            <td class="px-6 py-4"><span
+                                                    class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-bold">管理者</span>
+                                            </td>
+                                            <td class="px-6 py-4 text-center text-gray-400">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-6 py-4 font-bold text-gray-900">野口 広満</td>
+                                            <td class="px-6 py-4 text-gray-600">soken.noguchi@gmail.com</td>
+                                            <td class="px-6 py-4"><span
+                                                    class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold">一般ユーザー</span>
+                                            </td>
+                                            <td class="px-6 py-4 text-center">
+                                                <button
+                                                    class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition-colors"
+                                                    title="削除"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="bg-blue-50 p-4 rounded-lg flex gap-3 text-sm text-blue-800">
+                                <i data-lucide="info" class="w-5 h-5 shrink-0"></i>
+                                <p>セキュリティのため、ログインには「Googleでログイン」を使用します。ここに追加したGoogleアカウントを持つユーザーのみがシステムにアクセスできます。</p>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- タブ切り替えロジック -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+
+            // タブの切り替え処理
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // 全てのタブからactiveクラスを外す（ボタンのスタイルリセット）
+                    tabBtns.forEach(b => {
+                        b.classList.remove('active', 'border-blue-600', 'text-blue-700');
+                        b.classList.add('border-transparent', 'text-gray-500');
+                    });
+
+                    // クリックされたタブをactiveにする
+                    btn.classList.add('active', 'border-blue-600', 'text-blue-700');
+                    btn.classList.remove('border-transparent', 'text-gray-500');
+
+                    // 全てのコンテンツを非表示にする
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+
+                    // 対象のコンテンツを表示する
+                    const targetId = btn.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+        });
+
+        // 保存ボタンのダミーアクション
+        function saveSettings() {
+            // 保存アニメーションの代わりにボタンの色を一瞬変える
+            const btn = document.querySelector('button[onclick="saveSettings()"]');
+            const originalHtml = btn.innerHTML;
+
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 mr-2"></i> 保存しました';
+            btn.classList.replace('bg-blue-600', 'bg-green-600');
+            btn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+            lucide.createIcons();
+
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.classList.replace('bg-green-600', 'bg-blue-600');
+                btn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+                lucide.createIcons();
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>
