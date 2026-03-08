@@ -19,8 +19,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'File is required.' }, { status: 400 });
     }
 
+    console.log('Starting upload to R2...');
     const buffer = Buffer.from(await file.arrayBuffer());
-    const fileName = `quotes/${Date.now()}-${file.name}`;
+    const fileName = `settings/${Date.now()}-${file.name}`;
+    console.log('Bucket:', process.env.R2_BUCKET_NAME);
+    console.log('File Name:', fileName);
 
     const command = new PutObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME!,
@@ -29,14 +32,21 @@ export async function POST(req: Request) {
       ContentType: file.type,
     });
 
+    console.log('Sending command to S3 Client...');
     await s3Client.send(command);
+    console.log('Upload successful!');
 
     // Provide the public URL or key back to the client
-    const fileUrl = `${process.env.R2_ENDPOINT!}/${fileName}`; 
+    // Note: R2 Endpoint should be used with the bucket name in the path if needed,
+    // but here we just return the key and a temporary URL.
+    const fileUrl = `${process.env.R2_ENDPOINT!}/${process.env.R2_BUCKET_NAME!}/${fileName}`;
 
     return NextResponse.json({ success: true, url: fileUrl, key: fileName });
   } catch (error) {
-    console.error('Upload error:', error);
-    return NextResponse.json({ error: 'Failed to upload to R2.' }, { status: 500 });
+    console.error('Detailed Upload error:', error);
+    return NextResponse.json({
+      error: 'Failed to upload to R2.',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 });
   }
 }
